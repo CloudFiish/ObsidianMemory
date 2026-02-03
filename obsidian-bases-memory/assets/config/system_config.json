@@ -1,0 +1,29 @@
+{
+  "system": {
+    "version": "1.0.0",
+    "vault_path": "./",
+    "daily_log_folder": "memory",
+    "long_term_file": "MEMORY.md"
+  },
+  "recorder": {
+    "auto_title_generation": true,
+    "auto_tag_inference": true,
+    "default_importance": 3,
+    "require_confirmation": true,
+    "auto_open_after_create": true,
+    "templates": {
+      "daily": "assets/templates/daily_log_template.md",
+      "long_term": "assets/templates/long_term_memory_template.md"
+    }
+  },
+  "retriever": {
+    "default_search_mode": "hybrid",
+    "max_results": 10,
+    "similarity_threshold": 0.7,
+    "highlight_matches": true,
+    "show_snippets": true,
+    "enable_cache": true,
+    "cache_ttl": 300,
+    "index_path": ".memory_index"
+  }
+}

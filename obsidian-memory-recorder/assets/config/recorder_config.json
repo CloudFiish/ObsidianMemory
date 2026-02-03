@@ -1,0 +1,61 @@
+{
+  "vault_path": "",
+  "memory_folder": "memory",
+  "long_term_file": "MEMORY.md",
+  "auto_title_generation": true,
+  "auto_tag_inference": true,
+  "default_importance": 3,
+  "require_confirmation": true,
+  "auto_open_after_create": false,
+  "record_modes": {
+    "realtime": {
+      "enabled": true,
+      "command": "/record",
+      "description": "对话中实时记录"
+    },
+    "structured": {
+      "enabled": true,
+      "command": "/record-struct",
+      "description": "结构化表单记录"
+    },
+    "quick": {
+      "enabled": true,
+      "commands": {
+        "decision": "/decision",
+        "meeting": "/meeting",
+        "learn": "/learn"
+      }
+    }
+  },
+  "field_mappings": {
+    "database": ["#技术", "#数据库"],
+    "API": ["#技术", "#API"],
+    "decision": ["#技术", "#决策"],
+    "meeting": ["#会议"],
+    "learn": ["#学习"]
+  },
+  "importance_rules": {
+    "decision": 4,
+    "important": 5,
+    "urgent": 5,
+    "default": 3
+  },
+  "type_defaults": {
+    "daily-log": {
+      "importance": 3,
+      "status": "进行中"
+    },
+    "decision": {
+      "importance": 4,
+      "status": "已完成"
+    },
+    "meeting": {
+      "importance": 3,
+      "status": "已完成"
+    },
+    "learn": {
+      "importance": 3,
+      "status": "进行中"
+    }
+  }
+}

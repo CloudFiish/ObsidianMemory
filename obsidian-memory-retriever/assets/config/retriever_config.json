@@ -1,0 +1,100 @@
+{
+  "vault_path": "",
+  "memory_folder": "memory",
+  "long_term_file": "MEMORY.md",
+  "search_modes": {
+    "keyword": {
+      "enabled": true,
+      "command": "/search",
+      "default": true,
+      "description": "基于关键词的精确搜索"
+    },
+    "semantic": {
+      "enabled": true,
+      "command": "/semantic",
+      "embedding_model": "simple",
+      "threshold": 0.7,
+      "description": "基于语义相似度的搜索"
+    },
+    "hybrid": {
+      "enabled": true,
+      "command": "/find",
+      "keyword_weight": 0.3,
+      "semantic_weight": 0.7,
+      "description": "混合关键词和语义搜索"
+    }
+  },
+  "output_format": {
+    "default": "compact",
+    "max_results": 10,
+    "show_snippets": true,
+    "highlight_matches": true
+  },
+  "filters": {
+    "date": {
+      "enabled": true,
+      "quick_filters": {
+        "today": "/today",
+        "this_week": "/this-week",
+        "this_month": "/this-month"
+      }
+    },
+    "type": {
+      "enabled": true,
+      "types": [
+        "每日日志",
+        "决策",
+        "任务",
+        "学习笔记",
+        "会议记录",
+        "用户偏好"
+      ]
+    },
+    "importance": {
+      "enabled": true,
+      "quick_filters": {
+        "important": "/important",
+        "urgent": "/urgent"
+      }
+    },
+    "status": {
+      "enabled": true,
+      "quick_filters": {
+        "pending": "/pending",
+        "completed": "/completed"
+      }
+    },
+    "project": {
+      "enabled": true,
+      "command": "/project"
+    }
+  },
+  "sorting": {
+    "default": "relevance",
+    "options": {
+      "relevance": "相关性",
+      "date_desc": "日期降序",
+      "date_asc": "日期升序",
+      "importance_desc": "重要程度降序",
+      "importance_asc": "重要程度升序"
+    }
+  },
+  "embedding": {
+    "model": "simple",
+    "dimension": 1000,
+    "cache_enabled": true,
+    "cache_ttl": 3600
+  },
+  "performance": {
+    "enable_indexing": true,
+    "enable_caching": true,
+    "max_results": 100,
+    "result_limit": 10
+  },
+  "ui": {
+    "compact_mode": false,
+    "show_row_numbers": true,
+    "show_icons": true,
+    "color_output": true
+  }
+}
