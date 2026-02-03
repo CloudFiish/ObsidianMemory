@@ -1,0 +1,64 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "remember_event",
+      "description": "Store a new memory or event into the long-term memory system. Use this when the user shares important information, preferences, or task progress that should be remembered for future conversations.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The text content to remember."
+          },
+          "importance": {
+            "type": "integer",
+            "description": "Importance level from 1 (low) to 5 (high). Default is 3.",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of tags for categorization (e.g. ['work', 'project-x'])."
+          }
+        },
+        "required": ["content"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "recall_context",
+      "description": "Search for relevant past memories or context based on a query. Use this before answering questions that might depend on previous knowledge.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "The search query to find relevant memories."
+          },
+          "top_k": {
+            "type": "integer",
+            "description": "Number of results to return. Default is 5."
+          }
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "sync_memory",
+      "description": "Force synchronization of memory files to the vector index. Use this if the user indicates that files have been manually modified.",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+]
