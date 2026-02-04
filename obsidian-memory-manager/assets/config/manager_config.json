@@ -1,0 +1,55 @@
+{
+  "vault_path": "D:\\JF\\Note\\my-memory",
+  "auto_initialize": true,
+  "auto_detect_intent": true,
+  "components": {
+    "bases_memory": {
+      "enabled": true,
+      "path": "obsidian-bases-memory",
+      "init_script": "scripts/init_memory_system.py"
+    },
+    "recorder": {
+      "enabled": true,
+      "path": "obsidian-memory-recorder",
+      "time_script": "scripts/get_time.py",
+      "auto_record_keywords": [
+        "决定",
+        "选择",
+        "偏好",
+        "重要",
+        "采用",
+        "使用",
+        "放弃",
+        "转向"
+      ],
+      "min_importance_auto_record": 3
+    },
+    "retriever": {
+      "enabled": true,
+      "path": "obsidian-memory-retriever",
+      "default_search_mode": "hybrid",
+      "search_scripts": {
+        "keyword": "scripts/search.py",
+        "semantic": "scripts/semantic_search.py",
+        "hybrid": "scripts/hybrid_search.py"
+      }
+    }
+  },
+  "memory_rules": {
+    "min_importance_for_summary": 3,
+    "auto_sync_to_memory_md": [
+      "决策",
+      "用户偏好"
+    ],
+    "retention_days": 365,
+    "daily_log_format": "{Date}.md",
+    "memory_md_path": "MEMORY.md",
+    "memory_folder": "memory"
+  },
+  "ui_preferences": {
+    "show_confirmations": true,
+    "default_output_format": "detailed",
+    "max_search_results": 10,
+    "enable_shortcuts": true
+  }
+}

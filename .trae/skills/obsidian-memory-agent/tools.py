@@ -100,6 +100,7 @@ def sync_memory() -> str:
     return f"Synced {count} memory entries from {len(files)} files."
 
 if __name__ == "__main__":
-    # Simple CLI test
-    print(remember_event("Today I learned about Zvec vector database.", 5, ["learning"]))
-    print(recall_context("Zvec"))
+    # 记录用户最常用的工具是飞书
+    print(remember_event("用户最常用的工具是飞书", 5, ["user-preference", "tools", "feishu"]))
+    # 测试回忆功能
+    print(recall_context("用户常用的工具"))

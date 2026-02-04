@@ -12,6 +12,12 @@ try:
 except ImportError:
     ZVEC_AVAILABLE = False
 
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+
 class EmbeddingService:
     """Service to generate embeddings from text."""
     
@@ -64,8 +70,20 @@ class ZvecAdapter:
                 print(f"[ZvecAdapter] Error initializing Zvec: {e}. Falling back to Mock.")
                 self.collection = MockCollection(self.db_path)
         else:
-            print("[ZvecAdapter] Zvec library not found. Using Mock implementation.")
-            self.collection = MockCollection(self.db_path)
+            # Try connecting to remote bridge
+            if REQUESTS_AVAILABLE and self._try_connect_remote():
+                print("[ZvecAdapter] Connected to remote Zvec Bridge.")
+                self.collection = RemoteCollection("http://localhost:8000", self.collection_name)
+            else:
+                print("[ZvecAdapter] Zvec library not found and remote bridge unreachable. Using Mock implementation.")
+                self.collection = MockCollection(self.db_path)
+
+    def _try_connect_remote(self):
+        try:
+            resp = requests.get("http://localhost:8000/health", timeout=1)
+            return resp.status_code == 200
+        except:
+            return False
             
     def add_memory(self, doc_id, text, metadata=None):
         """Add a memory item to the database."""
@@ -78,12 +96,15 @@ class ZvecAdapter:
         metadata['content'] = text
         metadata['timestamp'] = datetime.now().isoformat()
         
-        if ZVEC_AVAILABLE and not isinstance(self.collection, MockCollection):
+        if self.collection and not isinstance(self.collection, MockCollection):
             try:
-                # Zvec insert
-                self.collection.insert([
-                    zvec.Doc(id=doc_id, vectors={"embedding": vector}, fields=metadata)
-                ])
+                if isinstance(self.collection, RemoteCollection):
+                    self.collection.insert(doc_id, vector, metadata)
+                else:
+                    # Zvec insert
+                    self.collection.insert([
+                        zvec.Doc(id=doc_id, vectors={"embedding": vector}, fields=metadata)
+                    ])
                 return True
             except Exception as e:
                 print(f"[ZvecAdapter] Insert failed: {e}")
@@ -98,25 +119,27 @@ class ZvecAdapter:
         query_vector = self.embedding_service.embed(query_text)
         
         results = []
-        if ZVEC_AVAILABLE and not isinstance(self.collection, MockCollection):
+        if self.collection and not isinstance(self.collection, MockCollection):
             try:
-                # Zvec query
-                matches = self.collection.query(
-                    zvec.VectorQuery("embedding", vector=query_vector),
-                    topk=top_k
-                )
-                # Parse results
-                # Assuming matches is a list of objects with id, score, fields
-                for match in matches:
-                    # Depending on Zvec API version, access might vary
-                    # Here assuming dict-like or object access
-                    res = {
-                        'id': match.id,
-                        'score': match.score,
-                        'content': match.fields.get('content', ''),
-                        'metadata': match.fields
-                    }
-                    results.append(res)
+                if isinstance(self.collection, RemoteCollection):
+                    matches = self.collection.query(query_vector, top_k)
+                    # Remote collection returns already formatted results
+                    return matches
+                else:
+                    # Zvec query
+                    matches = self.collection.query(
+                        zvec.VectorQuery("embedding", vector=query_vector),
+                        topk=top_k
+                    )
+                    # Parse results
+                    for match in matches:
+                        res = {
+                            'id': match.id,
+                            'score': match.score,
+                            'content': match.fields.get('content', ''),
+                            'metadata': match.fields
+                        }
+                        results.append(res)
             except Exception as e:
                 print(f"[ZvecAdapter] Query failed: {e}")
                 return []
@@ -124,6 +147,50 @@ class ZvecAdapter:
             # Mock query
             results = self.collection.query(query_vector, top_k)
             
+        return results
+
+class RemoteCollection:
+    """Adapter for remote Zvec Bridge Server."""
+    
+    def __init__(self, base_url, collection_name):
+        self.base_url = base_url
+        self.collection_name = collection_name
+        # Init collection on server
+        try:
+            requests.post(f"{self.base_url}/init", json={
+                "collection_name": collection_name,
+                "dimension": 128
+            })
+        except Exception as e:
+            print(f"[RemoteCollection] Warning: Init failed: {e}")
+            
+    def insert(self, doc_id, vector, metadata):
+        payload = [{
+            "id": doc_id,
+            "vectors": {"embedding": vector},
+            "fields": metadata
+        }]
+        resp = requests.post(f"{self.base_url}/insert", json=payload)
+        resp.raise_for_status()
+        
+    def query(self, vector, top_k):
+        payload = {
+            "vector": vector,
+            "top_k": top_k,
+            "vector_field": "embedding"
+        }
+        resp = requests.post(f"{self.base_url}/query", json=payload)
+        resp.raise_for_status()
+        data = resp.json()
+        
+        results = []
+        for item in data:
+            results.append({
+                'id': item['id'],
+                'score': item['score'],
+                'content': item['fields'].get('content', ''),
+                'metadata': item['fields']
+            })
         return results
 
 class MockCollection:
